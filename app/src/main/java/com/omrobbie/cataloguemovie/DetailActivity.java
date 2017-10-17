@@ -11,8 +11,8 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.omrobbie.cataloguemovie.api.APIClient;
-import com.omrobbie.cataloguemovie.mvp.model.detail.DetailModel;
-import com.omrobbie.cataloguemovie.mvp.model.search.ResultsItem;
+import com.omrobbie.cataloguemovie.data.model.detail.DetailModel;
+import com.omrobbie.cataloguemovie.data.model.search.ResultsItem;
 import com.omrobbie.cataloguemovie.utils.DateTime;
 
 import java.text.NumberFormat;

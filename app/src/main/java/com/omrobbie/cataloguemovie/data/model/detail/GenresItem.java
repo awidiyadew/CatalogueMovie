@@ -1,8 +1,8 @@
-package com.omrobbie.cataloguemovie.mvp.model.detail;
+package com.omrobbie.cataloguemovie.data.model.detail;
 
 import com.google.gson.annotations.SerializedName;
 
-public class ProductionCompaniesItem{
+public class GenresItem{
 
 	@SerializedName("name")
 	private String name;
@@ -29,7 +29,7 @@ public class ProductionCompaniesItem{
 	@Override
  	public String toString(){
 		return 
-			"ProductionCompaniesItem{" + 
+			"GenresItem{" + 
 			"name = '" + name + '\'' + 
 			",id = '" + id + '\'' + 
 			"}";

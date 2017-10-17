@@ -15,7 +15,7 @@ import com.google.gson.Gson;
 import com.omrobbie.cataloguemovie.BuildConfig;
 import com.omrobbie.cataloguemovie.DetailActivity;
 import com.omrobbie.cataloguemovie.R;
-import com.omrobbie.cataloguemovie.mvp.model.search.ResultsItem;
+import com.omrobbie.cataloguemovie.data.model.search.ResultsItem;
 import com.omrobbie.cataloguemovie.utils.CustomTextView;
 import com.omrobbie.cataloguemovie.utils.DateTime;
 

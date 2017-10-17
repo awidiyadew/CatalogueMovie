@@ -1,4 +1,4 @@
-package com.omrobbie.cataloguemovie.mvp.model.upcoming;
+package com.omrobbie.cataloguemovie.data.model.upcoming;
 
 import com.google.gson.annotations.SerializedName;
 

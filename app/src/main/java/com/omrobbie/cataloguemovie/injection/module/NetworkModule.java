@@ -2,6 +2,7 @@ package com.omrobbie.cataloguemovie.injection.module;
 
 import com.omrobbie.cataloguemovie.BuildConfig;
 import com.omrobbie.cataloguemovie.api.APICall;
+import com.omrobbie.cataloguemovie.data.remote.ApiService;
 
 import java.util.concurrent.TimeUnit;
 
@@ -18,8 +19,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class NetworkModule {
 
     @Provides
-    public APICall provideApiCall(Retrofit retrofit){
-        return retrofit.create(APICall.class);
+    public ApiService provideApiService(Retrofit retrofit){
+        return retrofit.create(ApiService.class);
     }
 
     @Provides

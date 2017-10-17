@@ -1,8 +1,8 @@
 package com.omrobbie.cataloguemovie.api;
 
-import com.omrobbie.cataloguemovie.mvp.model.detail.DetailModel;
-import com.omrobbie.cataloguemovie.mvp.model.search.SearchModel;
-import com.omrobbie.cataloguemovie.mvp.model.upcoming.UpcomingModel;
+import com.omrobbie.cataloguemovie.data.model.detail.DetailModel;
+import com.omrobbie.cataloguemovie.data.model.search.SearchModel;
+import com.omrobbie.cataloguemovie.data.model.upcoming.UpcomingModel;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
