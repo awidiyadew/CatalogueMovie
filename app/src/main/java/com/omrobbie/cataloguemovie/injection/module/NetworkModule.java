@@ -4,13 +4,18 @@ import com.omrobbie.cataloguemovie.BuildConfig;
 import com.omrobbie.cataloguemovie.api.APICall;
 import com.omrobbie.cataloguemovie.data.remote.ApiService;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import okhttp3.HttpUrl;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -37,10 +42,31 @@ public class NetworkModule {
 
     @Provides
     @Singleton
-    public OkHttpClient provideOkHttpClient(){
+    public OkHttpClient provideOkHttpClient(Interceptor interceptor){
         return new OkHttpClient.Builder()
-                .connectTimeout(60, TimeUnit.SECONDS)
+                .addInterceptor(interceptor)
                 .build();
+    }
+
+    @Provides
+    @Singleton
+    public Interceptor provideInterceptor() {
+        return new Interceptor() {
+            @Override
+            public Response intercept(Chain chain) throws IOException {
+                Request original = chain.request();
+                HttpUrl httpUrl = original.url()
+                        .newBuilder()
+                        .addQueryParameter("api_key", BuildConfig.API_KEY)
+                        .build();
+
+                original = original.newBuilder()
+                        .url(httpUrl)
+                        .build();
+
+                return chain.proceed(original);
+            }
+        };
     }
 
 }

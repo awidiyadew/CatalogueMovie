@@ -3,6 +3,7 @@ package com.omrobbie.cataloguemovie.injection.componen;
 import android.app.Application;
 import android.content.Context;
 
+import com.omrobbie.cataloguemovie.data.DataManager;
 import com.omrobbie.cataloguemovie.injection.annotation.ApplicationContext;
 import com.omrobbie.cataloguemovie.injection.module.ApplicationModule;
 import com.omrobbie.cataloguemovie.injection.module.NetworkModule;
@@ -20,6 +21,6 @@ public interface ApplicationComponent {
 
     Application getApplication();
 
-    //DataManager getDataManager();
+    DataManager getDataManager();
 
 }

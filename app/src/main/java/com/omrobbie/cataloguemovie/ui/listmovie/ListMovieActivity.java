@@ -2,7 +2,6 @@ package com.omrobbie.cataloguemovie.ui.listmovie;
 
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
@@ -15,10 +14,10 @@ import com.mancj.materialsearchbar.MaterialSearchBar;
 import com.omrobbie.cataloguemovie.R;
 import com.omrobbie.cataloguemovie.adapter.SearchAdapter;
 import com.omrobbie.cataloguemovie.api.APIClient;
-import com.omrobbie.cataloguemovie.mvp.MainPresenter;
-import com.omrobbie.cataloguemovie.mvp.MainView;
 import com.omrobbie.cataloguemovie.data.model.search.ResultsItem;
 import com.omrobbie.cataloguemovie.data.model.search.SearchModel;
+import com.omrobbie.cataloguemovie.mvp.MainView;
+import com.omrobbie.cataloguemovie.ui.base.BaseActivity;
 import com.omrobbie.cataloguemovie.utils.AlarmReceiver;
 import com.omrobbie.cataloguemovie.utils.DateTime;
 import com.omrobbie.cataloguemovie.utils.upcoming.SchedulerTask;
@@ -26,6 +25,8 @@ import com.omrobbie.cataloguemovie.utils.upcoming.SchedulerTask;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -35,11 +36,12 @@ import retrofit2.Response;
 
 import static android.support.v7.widget.DividerItemDecoration.VERTICAL;
 
-public class ListMovieActivity extends AppCompatActivity
+public class ListMovieActivity extends BaseActivity
         implements MainView,
         MaterialSearchBar.OnSearchActionListener,
         SwipeRefreshLayout.OnRefreshListener,
-        PopupMenu.OnMenuItemClickListener {
+        PopupMenu.OnMenuItemClickListener,
+        ListMovieContract.View {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -53,7 +55,7 @@ public class ListMovieActivity extends AppCompatActivity
     @BindView(R.id.rv_movielist)
     RecyclerView rv_movielist;
 
-    private SearchAdapter adapter;
+    private SearchAdapter mAdapter;
     private List<ResultsItem> list = new ArrayList<>();
 
     private Call<SearchModel> apiCall;
@@ -66,17 +68,23 @@ public class ListMovieActivity extends AppCompatActivity
     private AlarmReceiver alarmReceiver = new AlarmReceiver();
     private SchedulerTask schedulerTask;
 
+    @Inject ListMoviePresenter mPresenter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
+
+        // inject dependency to this activity
+        activityComponent().inject(this);
+        mPresenter.attachView(this);
 
         alarmReceiver.setRepeatingAlarm(this, alarmReceiver.TYPE_REPEATING, "07:00", "Good morning! Ready to pick your new movies today?");
 
         schedulerTask = new SchedulerTask(this);
         schedulerTask.createPeriodicTask();
 
-        ButterKnife.bind(this);
         setSupportActionBar(toolbar);
         search_bar.setOnSearchActionListener(this);
         swipe_refresh.setOnRefreshListener(this);
@@ -84,15 +92,16 @@ public class ListMovieActivity extends AppCompatActivity
         search_bar.inflateMenu(R.menu.main);
         search_bar.getMenu().setOnMenuItemClickListener(this);
 
-        MainPresenter presenter = new MainPresenter(this);
-
         setupList();
         setupListScrollListener();
-        startRefreshing();
+        //startRefreshing();
+
+        mPresenter.getPopularMovie();
     }
 
     @Override
     protected void onDestroy() {
+        mPresenter.detachView();
         super.onDestroy();
         if (apiCall != null) apiCall.cancel();
     }
@@ -121,7 +130,7 @@ public class ListMovieActivity extends AppCompatActivity
     /**
      * Invoked when "speech" or "navigation" buttons clicked.
      *
-     * @param buttonCode {@link #BUTTON_NAVIGATION} or {@link #BUTTON_SPEECH} will be passed
+     * @param buttonCode
      */
     @Override
     public void onButtonClicked(int buttonCode) {
@@ -136,8 +145,10 @@ public class ListMovieActivity extends AppCompatActivity
         currentPage = 1;
         totalPages = 1;
 
-        stopRefrehing();
-        startRefreshing();
+        mAdapter.clearAll();
+        //stopRefrehing();
+        //startRefreshing();
+        mPresenter.onPageRefresh();
     }
 
     /**
@@ -159,11 +170,15 @@ public class ListMovieActivity extends AppCompatActivity
         return false;
     }
 
+    public boolean isSearchMode() {
+        return !movie_title.isEmpty();
+    }
+
     private void setupList() {
-        adapter = new SearchAdapter();
+        mAdapter = new SearchAdapter();
         rv_movielist.addItemDecoration(new DividerItemDecoration(this, VERTICAL));
         rv_movielist.setLayoutManager(new LinearLayoutManager(this));
-        rv_movielist.setAdapter(adapter);
+        rv_movielist.setAdapter(mAdapter);
     }
 
     private void setupListScrollListener() {
@@ -190,8 +205,11 @@ public class ListMovieActivity extends AppCompatActivity
                 int pastVisibleItems = layoutManager.findFirstCompletelyVisibleItemPosition();
 
                 if (pastVisibleItems + visibleItems >= totalItems) {
-                    if (currentPage < totalPages) currentPage++;
-                    startRefreshing();
+                    if (isSearchMode()) {
+                        mPresenter.searchMovie(movie_title);
+                    } else {
+                        mPresenter.getPopularMovie();
+                    }
                 }
             }
         });
@@ -207,7 +225,7 @@ public class ListMovieActivity extends AppCompatActivity
             item.setReleaseDate(DateTime.getLongDate("2016-04-1" + i));
             list.add(item);
         }
-        adapter.replaceAll(list);
+        mAdapter.replaceAll(list);
     }
 
     private void loadData(final String movie_title) {
@@ -224,8 +242,8 @@ public class ListMovieActivity extends AppCompatActivity
                     List<ResultsItem> items = response.body().getResults();
                     showResults(response.body().getTotalResults());
 
-                    if (currentPage > 1) adapter.updateData(items);
-                    else adapter.replaceAll(items);
+                    if (currentPage > 1) mAdapter.updateData(items);
+                    else mAdapter.replaceAll(items);
 
                     stopRefrehing();
                 } else loadFailed();
@@ -247,7 +265,7 @@ public class ListMovieActivity extends AppCompatActivity
         if (swipe_refresh.isRefreshing()) return;
         swipe_refresh.setRefreshing(true);
 
-        loadData(movie_title);
+        //loadData(movie_title);
     }
 
     private void stopRefrehing() {
@@ -264,5 +282,40 @@ public class ListMovieActivity extends AppCompatActivity
         } else results = "Sorry! I can't find " + movie_title + " everywhere :(";
 
         getSupportActionBar().setSubtitle(results);
+    }
+
+    // ------------------------------------------------------------------------------------------------------------
+    // MVP View Implementation ------------------------------------------------------------------------------------
+    @Override
+    public void showLoading(boolean isShow) {
+        super.showLoading(isShow);
+        swipe_refresh.setRefreshing(isShow);
+    }
+
+    @Override
+    public void showError(Throwable error) {
+        super.showError(error);
+        Toast.makeText(this, "Error " + error.getMessage(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showPopularMovie(List<ResultsItem> resultsItems, int totalResult) {
+        int movieCount = mAdapter.getItemCount();
+        if (movieCount > 0) {
+            mAdapter.updateData(resultsItems);
+        } else {
+            mAdapter.replaceAll(resultsItems);
+        }
+        showResults(totalResult);
+    }
+
+    @Override
+    public void showSearchResult(List<ResultsItem> resultsItems, int totalResult) {
+
+    }
+
+    @Override
+    public void showNoDataFound() {
+
     }
 }
