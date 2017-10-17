@@ -11,7 +11,7 @@ import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 
-import com.omrobbie.cataloguemovie.MainActivity;
+import com.omrobbie.cataloguemovie.ui.listmovie.ListMovieActivity;
 import com.omrobbie.cataloguemovie.R;
 
 import java.util.Calendar;
@@ -45,7 +45,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         NotificationManager notificationManagerCompat = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-        Intent intent = new Intent(context, MainActivity.class);
+        Intent intent = new Intent(context, ListMovieActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, notifId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context)

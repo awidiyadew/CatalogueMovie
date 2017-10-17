@@ -1,4 +1,4 @@
-package com.omrobbie.cataloguemovie;
+package com.omrobbie.cataloguemovie.ui.listmovie;
 
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.mancj.materialsearchbar.MaterialSearchBar;
+import com.omrobbie.cataloguemovie.R;
 import com.omrobbie.cataloguemovie.adapter.SearchAdapter;
 import com.omrobbie.cataloguemovie.api.APIClient;
 import com.omrobbie.cataloguemovie.mvp.MainPresenter;
@@ -34,7 +35,7 @@ import retrofit2.Response;
 
 import static android.support.v7.widget.DividerItemDecoration.VERTICAL;
 
-public class MainActivity extends AppCompatActivity
+public class ListMovieActivity extends AppCompatActivity
         implements MainView,
         MaterialSearchBar.OnSearchActionListener,
         SwipeRefreshLayout.OnRefreshListener,
@@ -239,7 +240,7 @@ public class MainActivity extends AppCompatActivity
 
     private void loadFailed() {
         stopRefrehing();
-        Toast.makeText(MainActivity.this, "Failed to load data.\nPlease check your Internet connections!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(ListMovieActivity.this, "Failed to load data.\nPlease check your Internet connections!", Toast.LENGTH_SHORT).show();
     }
 
     private void startRefreshing() {
