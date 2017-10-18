@@ -2,7 +2,6 @@ package com.omrobbie.cataloguemovie.ui.detailmovie;
 
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -12,22 +11,22 @@ import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.omrobbie.cataloguemovie.BuildConfig;
 import com.omrobbie.cataloguemovie.R;
-import com.omrobbie.cataloguemovie.api.APIClient;
 import com.omrobbie.cataloguemovie.data.model.detail.DetailModel;
 import com.omrobbie.cataloguemovie.data.model.search.ResultsItem;
+import com.omrobbie.cataloguemovie.ui.base.BaseActivity;
 import com.omrobbie.cataloguemovie.utils.DateTime;
 
 import java.text.NumberFormat;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
-public class DetailActivity extends AppCompatActivity {
+public class DetailMovieActivity extends BaseActivity
+        implements DetailMovieContract.View {
 
     public static final String MOVIE_ITEM = "movie_item";
 
@@ -85,9 +84,9 @@ public class DetailActivity extends AppCompatActivity {
     @BindView(R.id.tv_countries)
     TextView tv_countries;
 
-    private Call<DetailModel> apiCall;
-    private APIClient apiClient = new APIClient();
     private Gson gson = new Gson();
+
+    @Inject DetailMoviePresenter mPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,31 +96,34 @@ public class DetailActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
         collapsing_toolbar.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
 
-        String movie_item = getIntent().getStringExtra(MOVIE_ITEM);
-        loadData(movie_item);
+        activityComponent().inject(this);
+        mPresenter.attachView(this);
+
+        String movieItemJson = getIntent().getStringExtra(MOVIE_ITEM);
+        ResultsItem movieItem = gson.fromJson(movieItemJson, ResultsItem.class);
+        bindBasicDesc(movieItem);
+
+        String movieId = String.valueOf(movieItem.getId());
+        mPresenter.getDetailMovie(movieId);
     }
 
     @Override
     protected void onDestroy() {
+        mPresenter.detachView();
         super.onDestroy();
-        if (apiCall != null) apiCall.cancel();
     }
 
-    private void loadData(String movie_item) {
-        ResultsItem item = gson.fromJson(movie_item, ResultsItem.class);
-        loadDataInServer(String.valueOf(item.getId()));
-
+    private void bindBasicDesc(ResultsItem item) {
         getSupportActionBar().setTitle(item.getTitle());
         tv_title.setText(item.getTitle());
 
-        Glide.with(DetailActivity.this)
+        Glide.with(DetailMovieActivity.this)
                 .load(BuildConfig.BASE_URL_IMG + "w185" + item.getBackdropPath())
                 .into(img_backdrop);
 
-        Glide.with(DetailActivity.this)
+        Glide.with(DetailMovieActivity.this)
                 .load(BuildConfig.BASE_URL_IMG + "w154" + item.getPosterPath())
                 .into(img_poster);
 
@@ -143,58 +145,52 @@ public class DetailActivity extends AppCompatActivity {
         }
     }
 
-    private void loadDataInServer(String movie_item) {
-        apiCall = apiClient.getService().getDetailMovie(movie_item);
-        apiCall.enqueue(new Callback<DetailModel>() {
-            @Override
-            public void onResponse(Call<DetailModel> call, Response<DetailModel> response) {
-                if (response.isSuccessful()) {
-                    DetailModel item = response.body();
-
-                    int size = 0;
-
-                    String genres = "";
-                    size = item.getGenres().size();
-                    for (int i = 0; i < size; i++) {
-                        genres += "√ " + item.getGenres().get(i).getName() + (i + 1 < size ? "\n" : "");
-                    }
-                    tv_genres.setText(genres);
-
-                    if (item.getBelongsToCollection() != null) {
-                        Glide.with(DetailActivity.this)
-                                .load(BuildConfig.BASE_URL_IMG + "w92" + item.getBelongsToCollection().getPosterPath())
-                                .into(img_poster_belongs);
-
-                        tv_title_belongs.setText(item.getBelongsToCollection().getName());
-                    }
-
-                    tv_budget.setText("$ " + NumberFormat.getIntegerInstance().format(item.getBudget()));
-                    tv_revenue.setText("$ " + NumberFormat.getIntegerInstance().format(item.getRevenue()));
-
-                    String companies = "";
-                    size = item.getProductionCompanies().size();
-                    for (int i = 0; i < size; i++) {
-                        companies += "√ " + item.getProductionCompanies().get(i).getName() + (i + 1 < size ? "\n" : "");
-                    }
-                    tv_companies.setText(companies);
-
-                    String countries = "";
-                    size = item.getProductionCountries().size();
-                    for (int i = 0; i < size; i++) {
-                        countries += "√ " + item.getProductionCountries().get(i).getName() + (i + 1 < size ? "\n" : "");
-                    }
-                    tv_countries.setText(countries);
-                } else loadFailed();
-            }
-
-            @Override
-            public void onFailure(Call<DetailModel> call, Throwable t) {
-                loadFailed();
-            }
-        });
+    // ------------------------------------------------------------------------------------------------------------
+    // MVP View Implementation ------------------------------------------------------------------------------------
+    @Override
+    public void showLoading(boolean isShow) {
+        // do something when loading data
     }
 
-    private void loadFailed() {
-        Toast.makeText(DetailActivity.this, "Cannot fetch detail movie.\nPlease check your Internet connections!", Toast.LENGTH_SHORT).show();
+    @Override
+    public void showError(Throwable error) {
+        super.showError(error);
+        Toast.makeText(this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
     }
+
+    @Override
+    public void showDetailMovie(DetailModel item) {
+        String genres = "";
+        int size = item.getGenres().size();
+        for (int i = 0; i < size; i++) {
+            genres += "√ " + item.getGenres().get(i).getName() + (i + 1 < size ? "\n" : "");
+        }
+        tv_genres.setText(genres);
+
+        if (item.getBelongsToCollection() != null) {
+            Glide.with(DetailMovieActivity.this)
+                    .load(BuildConfig.BASE_URL_IMG + "w92" + item.getBelongsToCollection().getPosterPath())
+                    .into(img_poster_belongs);
+
+            tv_title_belongs.setText(item.getBelongsToCollection().getName());
+        }
+
+        tv_budget.setText("$ " + NumberFormat.getIntegerInstance().format(item.getBudget()));
+        tv_revenue.setText("$ " + NumberFormat.getIntegerInstance().format(item.getRevenue()));
+
+        String companies = "";
+        size = item.getProductionCompanies().size();
+        for (int i = 0; i < size; i++) {
+            companies += "√ " + item.getProductionCompanies().get(i).getName() + (i + 1 < size ? "\n" : "");
+        }
+        tv_companies.setText(companies);
+
+        String countries = "";
+        size = item.getProductionCountries().size();
+        for (int i = 0; i < size; i++) {
+            countries += "√ " + item.getProductionCountries().get(i).getName() + (i + 1 < size ? "\n" : "");
+        }
+        tv_countries.setText(countries);
+    }
+
 }

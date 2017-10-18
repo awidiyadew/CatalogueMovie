@@ -1,5 +1,7 @@
 package com.omrobbie.cataloguemovie.utils;
 
+import android.util.Log;
+
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 

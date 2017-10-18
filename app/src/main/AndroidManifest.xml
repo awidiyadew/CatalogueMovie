@@ -23,7 +23,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.detailmovie.DetailActivity"
+            android:name=".ui.detailmovie.DetailMovieActivity"
             android:parentActivityName=".ui.listmovie.ListMovieActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

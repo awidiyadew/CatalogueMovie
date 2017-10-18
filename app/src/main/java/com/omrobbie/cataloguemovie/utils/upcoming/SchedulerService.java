@@ -14,7 +14,7 @@ import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.GcmTaskService;
 import com.google.android.gms.gcm.TaskParams;
 import com.google.gson.Gson;
-import com.omrobbie.cataloguemovie.ui.detailmovie.DetailActivity;
+import com.omrobbie.cataloguemovie.ui.detailmovie.DetailMovieActivity;
 import com.omrobbie.cataloguemovie.R;
 import com.omrobbie.cataloguemovie.api.APIClient;
 import com.omrobbie.cataloguemovie.data.model.upcoming.ResultsItem;
@@ -79,8 +79,8 @@ public class SchedulerService extends GcmTaskService {
         NotificationManager notificationManagerCompat = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-        Intent intent = new Intent(context, DetailActivity.class);
-        intent.putExtra(DetailActivity.MOVIE_ITEM, new Gson().toJson(item));
+        Intent intent = new Intent(context, DetailMovieActivity.class);
+        intent.putExtra(DetailMovieActivity.MOVIE_ITEM, new Gson().toJson(item));
         PendingIntent pendingIntent = PendingIntent.getActivity(context, notifId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context)

@@ -13,7 +13,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.gson.Gson;
 import com.omrobbie.cataloguemovie.BuildConfig;
-import com.omrobbie.cataloguemovie.ui.detailmovie.DetailActivity;
+import com.omrobbie.cataloguemovie.ui.detailmovie.DetailMovieActivity;
 import com.omrobbie.cataloguemovie.R;
 import com.omrobbie.cataloguemovie.data.model.search.ResultsItem;
 import com.omrobbie.cataloguemovie.utils.CustomTextView;
@@ -59,8 +59,8 @@ public class SearchViewHolder extends RecyclerView.ViewHolder {
         itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(itemView.getContext(), DetailActivity.class);
-                intent.putExtra(DetailActivity.MOVIE_ITEM, new Gson().toJson(item));
+                Intent intent = new Intent(itemView.getContext(), DetailMovieActivity.class);
+                intent.putExtra(DetailMovieActivity.MOVIE_ITEM, new Gson().toJson(item));
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat

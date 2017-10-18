@@ -6,6 +6,7 @@ import android.content.Context;
 import com.omrobbie.cataloguemovie.injection.annotation.ActivityContext;
 import com.omrobbie.cataloguemovie.injection.annotation.PerActivity;
 import com.omrobbie.cataloguemovie.injection.module.ActivityModule;
+import com.omrobbie.cataloguemovie.ui.detailmovie.DetailMovieActivity;
 import com.omrobbie.cataloguemovie.ui.listmovie.ListMovieActivity;
 
 import dagger.Subcomponent;
@@ -23,5 +24,7 @@ public interface ActivityComponent {
     Context getContext();
 
     void inject(ListMovieActivity listMovieActivity);
+
+    void inject(DetailMovieActivity detailMovieActivity);
 
 }
