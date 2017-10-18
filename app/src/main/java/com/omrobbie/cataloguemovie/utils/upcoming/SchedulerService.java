@@ -14,7 +14,7 @@ import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.GcmTaskService;
 import com.google.android.gms.gcm.TaskParams;
 import com.google.gson.Gson;
-import com.omrobbie.cataloguemovie.DetailActivity;
+import com.omrobbie.cataloguemovie.ui.detailmovie.DetailActivity;
 import com.omrobbie.cataloguemovie.R;
 import com.omrobbie.cataloguemovie.api.APIClient;
 import com.omrobbie.cataloguemovie.data.model.upcoming.ResultsItem;

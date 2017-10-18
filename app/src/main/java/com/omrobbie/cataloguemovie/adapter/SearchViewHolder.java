@@ -13,7 +13,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.gson.Gson;
 import com.omrobbie.cataloguemovie.BuildConfig;
-import com.omrobbie.cataloguemovie.DetailActivity;
+import com.omrobbie.cataloguemovie.ui.detailmovie.DetailActivity;
 import com.omrobbie.cataloguemovie.R;
 import com.omrobbie.cataloguemovie.data.model.search.ResultsItem;
 import com.omrobbie.cataloguemovie.utils.CustomTextView;

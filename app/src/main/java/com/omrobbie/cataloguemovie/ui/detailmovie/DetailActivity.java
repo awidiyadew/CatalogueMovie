@@ -1,4 +1,4 @@
-package com.omrobbie.cataloguemovie;
+package com.omrobbie.cataloguemovie.ui.detailmovie;
 
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -10,6 +10,8 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
+import com.omrobbie.cataloguemovie.BuildConfig;
+import com.omrobbie.cataloguemovie.R;
 import com.omrobbie.cataloguemovie.api.APIClient;
 import com.omrobbie.cataloguemovie.data.model.detail.DetailModel;
 import com.omrobbie.cataloguemovie.data.model.search.ResultsItem;

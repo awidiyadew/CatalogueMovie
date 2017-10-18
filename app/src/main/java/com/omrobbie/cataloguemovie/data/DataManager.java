@@ -1,5 +1,6 @@
 package com.omrobbie.cataloguemovie.data;
 
+import com.omrobbie.cataloguemovie.data.model.detail.DetailModel;
 import com.omrobbie.cataloguemovie.data.model.search.SearchModel;
 import com.omrobbie.cataloguemovie.data.remote.ApiService;
 
@@ -22,8 +23,8 @@ public class DataManager {
         return mApiService.getPopularMovie(page);
     }
 
-    public Single<SearchModel> searchMovie(int page, String movieTitle) {
-        return mApiService.getSearchMovie(page, movieTitle);
+    public Single<DetailModel> getDetailMovie(String movieId) {
+        return mApiService.getDetailMovie(movieId);
     }
 
 }
