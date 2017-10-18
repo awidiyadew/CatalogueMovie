@@ -11,8 +11,6 @@ public interface ListMovieContract {
 
         void showPopularMovie(List<ResultsItem> resultsItems, int totalResult);
 
-        void showSearchResult(List<ResultsItem> resultsItems, int totalResult);
-
         void showNoDataFound();
 
     }
@@ -21,7 +19,7 @@ public interface ListMovieContract {
 
         void getPopularMovie();
 
-        void searchMovie(String movieTitle);
+        void onPageRefresh();
 
     }
 

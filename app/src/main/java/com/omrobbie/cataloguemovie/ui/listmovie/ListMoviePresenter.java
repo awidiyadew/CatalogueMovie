@@ -23,9 +23,8 @@ public class ListMoviePresenter extends BasePresenter<ListMovieContract.View>
 
     private static final String TAG = ListMoviePresenter.class.getSimpleName();
     private final DataManager mDataManager;
-    private int mPageNumber = 1;
+    private int mPageNumber = 0;
     private int mTotalPage = 0;
-    private String mMovieTitle = "";
 
     @Inject
     public ListMoviePresenter(DataManager mDataManager) {
@@ -39,6 +38,8 @@ public class ListMoviePresenter extends BasePresenter<ListMovieContract.View>
         if (mPageNumber < mTotalPage) {
             mPageNumber++;
         }
+
+        Log.d(TAG, "getPopularMovie: page number " + String.valueOf(mPageNumber));
 
         Disposable disposable = mDataManager.getPopularMovie(mPageNumber)
                 .subscribeOn(Schedulers.io())
@@ -73,8 +74,10 @@ public class ListMoviePresenter extends BasePresenter<ListMovieContract.View>
     }
 
     @Override
-    public void searchMovie(String movieTitle) {
-
+    public void onPageRefresh() {
+        mPageNumber = 1;
+        mTotalPage = 0;
+        getPopularMovie();
     }
 
 }

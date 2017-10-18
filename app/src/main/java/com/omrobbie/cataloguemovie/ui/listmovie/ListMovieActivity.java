@@ -7,6 +7,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -19,7 +20,6 @@ import com.omrobbie.cataloguemovie.data.model.search.SearchModel;
 import com.omrobbie.cataloguemovie.mvp.MainView;
 import com.omrobbie.cataloguemovie.ui.base.BaseActivity;
 import com.omrobbie.cataloguemovie.utils.AlarmReceiver;
-import com.omrobbie.cataloguemovie.utils.DateTime;
 import com.omrobbie.cataloguemovie.utils.upcoming.SchedulerTask;
 
 import java.text.NumberFormat;
@@ -31,8 +31,6 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 import static android.support.v7.widget.DividerItemDecoration.VERTICAL;
 
@@ -43,6 +41,7 @@ public class ListMovieActivity extends BaseActivity
         PopupMenu.OnMenuItemClickListener,
         ListMovieContract.View {
 
+    private static final String TAG = ListMovieActivity.class.getSimpleName();
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
@@ -56,14 +55,6 @@ public class ListMovieActivity extends BaseActivity
     RecyclerView rv_movielist;
 
     private SearchAdapter mAdapter;
-    private List<ResultsItem> list = new ArrayList<>();
-
-    private Call<SearchModel> apiCall;
-    private APIClient apiClient = new APIClient();
-
-    private String movie_title = "";
-    private int currentPage = 1;
-    private int totalPages = 1;
 
     private AlarmReceiver alarmReceiver = new AlarmReceiver();
     private SchedulerTask schedulerTask;
@@ -94,8 +85,6 @@ public class ListMovieActivity extends BaseActivity
 
         setupList();
         setupListScrollListener();
-        //startRefreshing();
-
         mPresenter.getPopularMovie();
     }
 
@@ -103,7 +92,6 @@ public class ListMovieActivity extends BaseActivity
     protected void onDestroy() {
         mPresenter.detachView();
         super.onDestroy();
-        if (apiCall != null) apiCall.cancel();
     }
 
     /**
@@ -123,8 +111,8 @@ public class ListMovieActivity extends BaseActivity
      */
     @Override
     public void onSearchConfirmed(CharSequence text) {
-        movie_title = String.valueOf(text);
-        onRefresh();
+        Log.d(TAG, "onSearchConfirmed: text " + text.toString());
+        Toast.makeText(this, "Feature disabled!", Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -142,12 +130,7 @@ public class ListMovieActivity extends BaseActivity
      */
     @Override
     public void onRefresh() {
-        currentPage = 1;
-        totalPages = 1;
-
         mAdapter.clearAll();
-        //stopRefrehing();
-        //startRefreshing();
         mPresenter.onPageRefresh();
     }
 
@@ -168,10 +151,6 @@ public class ListMovieActivity extends BaseActivity
         }
 
         return false;
-    }
-
-    public boolean isSearchMode() {
-        return !movie_title.isEmpty();
     }
 
     private void setupList() {
@@ -205,71 +184,10 @@ public class ListMovieActivity extends BaseActivity
                 int pastVisibleItems = layoutManager.findFirstCompletelyVisibleItemPosition();
 
                 if (pastVisibleItems + visibleItems >= totalItems) {
-                    if (isSearchMode()) {
-                        mPresenter.searchMovie(movie_title);
-                    } else {
-                        mPresenter.getPopularMovie();
-                    }
+                    mPresenter.getPopularMovie();
                 }
             }
         });
-    }
-
-    private void loadDummyData() {
-        list.clear();
-        for (int i = 0; i <= 10; i++) {
-            ResultsItem item = new ResultsItem();
-            item.setPosterPath("/vSNxAJTlD0r02V9sPYpOjqDZXUK.jpg");
-            item.setTitle("This is very very very long movie title that you can read " + i);
-            item.setOverview("This is very very very long movie overview that you can read " + i);
-            item.setReleaseDate(DateTime.getLongDate("2016-04-1" + i));
-            list.add(item);
-        }
-        mAdapter.replaceAll(list);
-    }
-
-    private void loadData(final String movie_title) {
-        getSupportActionBar().setSubtitle("");
-
-        if (movie_title.isEmpty()) apiCall = apiClient.getService().getPopularMovie(currentPage);
-        else apiCall = apiClient.getService().getSearchMovie(currentPage, movie_title);
-
-        apiCall.enqueue(new Callback<SearchModel>() {
-            @Override
-            public void onResponse(Call<SearchModel> call, Response<SearchModel> response) {
-                if (response.isSuccessful()) {
-                    totalPages = response.body().getTotalPages();
-                    List<ResultsItem> items = response.body().getResults();
-                    showResults(response.body().getTotalResults());
-
-                    if (currentPage > 1) mAdapter.updateData(items);
-                    else mAdapter.replaceAll(items);
-
-                    stopRefrehing();
-                } else loadFailed();
-            }
-
-            @Override
-            public void onFailure(Call<SearchModel> call, Throwable t) {
-                loadFailed();
-            }
-        });
-    }
-
-    private void loadFailed() {
-        stopRefrehing();
-        Toast.makeText(ListMovieActivity.this, "Failed to load data.\nPlease check your Internet connections!", Toast.LENGTH_SHORT).show();
-    }
-
-    private void startRefreshing() {
-        if (swipe_refresh.isRefreshing()) return;
-        swipe_refresh.setRefreshing(true);
-
-        //loadData(movie_title);
-    }
-
-    private void stopRefrehing() {
-        if (swipe_refresh.isRefreshing()) swipe_refresh.setRefreshing(false);
     }
 
     private void showResults(int totalResults) {
@@ -279,7 +197,7 @@ public class ListMovieActivity extends BaseActivity
 
         if (totalResults > 0) {
             results = "I found " + formatResults + " movie" + (totalResults > 1 ? "s" : "") + " for you :)";
-        } else results = "Sorry! I can't find " + movie_title + " everywhere :(";
+        } else results = "Sorry! I can't find your movie :(";
 
         getSupportActionBar().setSubtitle(results);
     }
@@ -300,22 +218,13 @@ public class ListMovieActivity extends BaseActivity
 
     @Override
     public void showPopularMovie(List<ResultsItem> resultsItems, int totalResult) {
-        int movieCount = mAdapter.getItemCount();
-        if (movieCount > 0) {
-            mAdapter.updateData(resultsItems);
-        } else {
-            mAdapter.replaceAll(resultsItems);
-        }
+        mAdapter.updateData(resultsItems);
         showResults(totalResult);
     }
 
     @Override
-    public void showSearchResult(List<ResultsItem> resultsItems, int totalResult) {
-
-    }
-
-    @Override
     public void showNoDataFound() {
-
+        Toast.makeText(this, "No data found", Toast.LENGTH_SHORT).show();
     }
+
 }

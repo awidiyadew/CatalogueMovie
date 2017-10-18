@@ -1,11 +1,9 @@
 package com.omrobbie.cataloguemovie.injection.module;
 
 import com.omrobbie.cataloguemovie.BuildConfig;
-import com.omrobbie.cataloguemovie.api.APICall;
 import com.omrobbie.cataloguemovie.data.remote.ApiService;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Singleton;
 
