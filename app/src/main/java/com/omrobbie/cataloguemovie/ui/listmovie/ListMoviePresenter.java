@@ -23,7 +23,7 @@ public class ListMoviePresenter extends BasePresenter<ListMovieContract.View>
 
     private static final String TAG = ListMoviePresenter.class.getSimpleName();
     private final DataManager mDataManager;
-    private int mPageNumber = 0;
+    private int mPageNumber = 1;
     private int mTotalPage = 0;
 
     @Inject

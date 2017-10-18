@@ -14,23 +14,19 @@ import android.widget.Toast;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 import com.omrobbie.cataloguemovie.R;
 import com.omrobbie.cataloguemovie.adapter.SearchAdapter;
-import com.omrobbie.cataloguemovie.api.APIClient;
 import com.omrobbie.cataloguemovie.data.model.search.ResultsItem;
-import com.omrobbie.cataloguemovie.data.model.search.SearchModel;
 import com.omrobbie.cataloguemovie.mvp.MainView;
 import com.omrobbie.cataloguemovie.ui.base.BaseActivity;
 import com.omrobbie.cataloguemovie.utils.AlarmReceiver;
 import com.omrobbie.cataloguemovie.utils.upcoming.SchedulerTask;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import retrofit2.Call;
 
 import static android.support.v7.widget.DividerItemDecoration.VERTICAL;
 
@@ -184,6 +180,7 @@ public class ListMovieActivity extends BaseActivity
                 int pastVisibleItems = layoutManager.findFirstCompletelyVisibleItemPosition();
 
                 if (pastVisibleItems + visibleItems >= totalItems) {
+                    Log.d(TAG, "onScrolled: load more movie");
                     mPresenter.getPopularMovie();
                 }
             }
