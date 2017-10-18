@@ -21,6 +21,8 @@ public interface ListMovieContract {
 
         void onPageRefresh();
 
+        void onConfigurationChange();
+
     }
 
 }
