@@ -29,7 +29,7 @@ public class ListMoviePresenter extends BasePresenter<ListMovieContract.View>
     private int mPageNumber = 1;
     private int mTotalPage;
     private List<ResultsItem> mListMovie;
-    boolean isConfigChange = false;
+    private boolean isConfigChange = false;
     private int mTotalAvailableMovies;
 
     @Inject
@@ -44,7 +44,6 @@ public class ListMoviePresenter extends BasePresenter<ListMovieContract.View>
         if (isConfigChange) {
             Log.d(TAG, "getPopularMovie: config change, restore " +
                      mListMovie.size() + " movies from configPersistent component...");
-
             getMvpView().showPopularMovie(mListMovie, mTotalAvailableMovies);
             isConfigChange = false;
             return;
@@ -75,6 +74,7 @@ public class ListMoviePresenter extends BasePresenter<ListMovieContract.View>
 
                         mTotalAvailableMovies = searchModel.getTotalResults();
                         mTotalPage = searchModel.getTotalPages();
+                        Log.d(TAG, "onSuccess: page number " + String.valueOf(searchModel.getPage()));
                         Log.d(TAG, "onSuccess: new retrievedMovies size= " + retrievedMovies.size());
                         Log.d(TAG, "onSuccess: member list size: " + String.valueOf(mListMovie.size()));
                         if (!retrievedMovies.isEmpty()) {
@@ -103,8 +103,9 @@ public class ListMoviePresenter extends BasePresenter<ListMovieContract.View>
     }
 
     @Override
-    public void onConfigurationChange() {
-        isConfigChange = true;
+    public void setConfigurationChange(boolean isConfigChange) {
+        Log.d(TAG, "setConfigurationChange: " + String.valueOf(isConfigChange));
+        this.isConfigChange = isConfigChange;
     }
 
 }

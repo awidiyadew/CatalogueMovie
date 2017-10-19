@@ -84,13 +84,9 @@ public class ListMovieActivity extends BaseActivity
 
     @Override
     protected void onDestroy() {
-        mPresenter.detachView();
         super.onDestroy();
-
-        if (isChangingConfigurations()) {
-            Log.d(TAG, "onDestroy: configuration change!");
-            mPresenter.onConfigurationChange();
-        }
+        mPresenter.detachView();
+        mPresenter.setConfigurationChange(isChangingConfigurations());
     }
 
     /**
