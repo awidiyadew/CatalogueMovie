@@ -179,8 +179,10 @@ public class ListMovieActivity extends BaseActivity
                 int pastVisibleItems = layoutManager.findFirstCompletelyVisibleItemPosition();
 
                 if (pastVisibleItems + visibleItems >= totalItems) {
-                    Log.d(TAG, "onScrolled: load more movie");
-                    mPresenter.getPopularMovie();
+                    if (!swipe_refresh.isRefreshing()) {
+                        Log.d(TAG, "onScrolled: load more movie");
+                        mPresenter.getPopularMovie();
+                    }
                 }
             }
         });
