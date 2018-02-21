@@ -6,7 +6,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.omrobbie.cataloguemovie.R;
-import com.omrobbie.cataloguemovie.mvp.model.search.ResultsItem;
+import com.omrobbie.cataloguemovie.data.model.search.ResultsItem;
 
 import java.util.ArrayList;
 import java.util.List;

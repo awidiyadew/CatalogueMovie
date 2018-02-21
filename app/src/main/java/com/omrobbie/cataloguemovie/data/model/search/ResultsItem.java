@@ -1,4 +1,4 @@
-package com.omrobbie.cataloguemovie.mvp.model.search;
+package com.omrobbie.cataloguemovie.data.model.search;
 
 import com.google.gson.annotations.SerializedName;
 
